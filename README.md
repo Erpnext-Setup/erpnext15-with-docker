@@ -32,8 +32,8 @@ docker run -it --network erpnet --name erp -p 8000:8000 -p 9000:9000 -p 3306:330
 ## exec into erp container
 ```
 docker exec -it erp bash
-cd frappe-bench && bench new-site erp.local --admin-password '321' --mariadb-root-username root --db-host erpdb  # db-pass: 1QWERT2
-bench --site erp.local install-app erpnext
+cd frappe-bench && bench new-site 1devops2.blog --admin-password '321' --mariadb-root-username root --db-host erpdb  # db-pass: 1QWERT2
+bench --site 1devops2.blog install-app erpnext
 ```
 
 ### install pos-awesome [optional]
@@ -41,7 +41,7 @@ bench --site erp.local install-app erpnext
 bench get-app branch version-14 https://github.com/yrestom/POS-Awesome.git
 bench setup requirements
 bench build --app posawesome
-bench --site erp.local install-app posawesome
+bench --site 1devops2.blog install-app posawesome
 ```
 
 ### start erp
@@ -52,18 +52,18 @@ cd /home/frappe/frappe-bench && bench start
 ## For Local Setup: set hostname & add entry into `/etc/hosts`
 ### set hostname
 ```
-hostnamectl set-hostname erp.local
+hostnamectl set-hostname 1devops2.blog
 exec bash
 ```
 ### add entry in /etc/hosts
 ```
 nano /etc/hosts
-127.0.0.1 erp.local erp
+127.0.0.1 1devops2.blog 1devops2
 ```
 
 ### access erp     
 ```
-http://erp.local:8000
+http://1devops2.blog:8000
 ```
 
 ## setup nginx as reverse proxy
@@ -77,7 +77,7 @@ systemctl status nginx
 sudo cat << 'EOF' >> /etc/nginx/sites-available/erp
 server {
     listen 80;
-    server_name erp.local;
+    server_name 1devops2.blog www.1devops2.blog;
 
     location / {
         proxy_pass http://localhost:8000;  
@@ -98,5 +98,20 @@ systemctl reload nginx
 
 ### access with nginx
 ```
-http://erp.local/app
+http://1devops2.blog/app
+```
+
+## Secure Nginx with Let's Encrypt
+### Install Certbot
+```
+sudo apt install certbot python3-certbot-nginx -y
+```
+
+### obtain SSL certificates
+```
+sudo certbot --nginx -d 1devops2.blog -d www.1devops2.blog
+```
+## Ports
+```
+80 443 8000 9000 3306
 ```
