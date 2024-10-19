@@ -46,7 +46,7 @@ bench --site 1devops2.blog install-app posawesome
 
 ### start erp
 ```
-bench use erp.local 
+bench use 1devops2.blog
 cd /home/frappe/frappe-bench && bench start
 ```
 ## For Local Setup: set hostname & add entry into `/etc/hosts`
