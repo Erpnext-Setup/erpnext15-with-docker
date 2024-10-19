@@ -1,4 +1,5 @@
-# erpnext15 with docker
+# ErpNext15 with docker
+![Alt text](https://github.com/Erpnext-Setup/erpnext15-with-docker/blob/main/Youtube%20Thumbnail.png)
 
 ##  pull image
 ```
