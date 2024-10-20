@@ -51,5 +51,22 @@ jobs:
           cd /home/frappe/frappe-bench && screen -dmS bench_session bash -c 'bench start' && \
           exit "
 
+    - name: Wait for the container to start
+      run: |
+        echo "Waiting for the container to start..."
+        sleep 15 
+
+    - name: Verify the application is accessible
+      run: |
+        for i in {1..3}; do
+          if curl -s --head http://localhost:8000 | grep "200 OK"; then
+            echo "Application is accessible."
+            exit 0
+          fi
+          echo "Application is not accessible yet. Retrying in 5 seconds..."
+          sleep 2
+        done
+        echo "Application is not accessible after multiple attempts."
+        exit 1
     
   
