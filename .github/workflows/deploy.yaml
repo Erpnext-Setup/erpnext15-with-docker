@@ -51,15 +51,41 @@ jobs:
           cd /home/frappe/frappe-bench && screen -dmS bench_session bash -c 'bench start' && \
           exit "
 
-    - name: Wait for the container to start
+    - name: Install Nginx
       run: |
-        echo "Waiting for the container to start..."
+        sudo apt install nginx -y
+        sudo systemctl start nginx
+        sudo systemctl status nginx
+
+    - name: Configuration file for erp 
+      run: |
+        sudo cat << 'EOF' | sudo tee /etc/nginx/sites-available/erp
+        server {
+            listen 80;
+            location / {
+                proxy_pass http://localhost:8000;  
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            }
+        }
+        EOF
+
+    - name: Enable configuration file and reload the nginx
+      run: |
+        sudo ln -s /etc/nginx/sites-available/erp /etc/nginx/sites-enabled/erp
+        sudo rm /etc/nginx/sites-enabled/default
+        sudo systemctl reload nginx
+
+    - name: Wait for the erp app to start
+      run: |
+        echo "Waiting for the erp app to start..."
         sleep 15 
 
     - name: Verify the application is accessible
       run: |
         for i in {1..3}; do
-          if curl -s --head http://localhost:8000 | grep "200 OK"; then
+          if curl -s --head http://localhost:80 | grep "200 OK"; then
             echo "Application is accessible."
             exit 0
           fi
