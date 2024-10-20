@@ -1,0 +1,17 @@
+name: deploy Erp app
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy-erp-app:
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: setup docker
+      uses: docker-practice/actions-setup-docker@master
+
+    - name: check docker version
+      run: docker --version
