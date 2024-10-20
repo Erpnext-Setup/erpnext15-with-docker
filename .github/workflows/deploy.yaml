@@ -4,6 +4,12 @@ on:
   push:
     branches: [ "main" ]
 
+env:
+  ADMIN_PASSWORD: 321
+  MYSQL_ROOT_USER: root
+  MYSQL_ROOT_PASSWORD: 1QWERT2
+  APP_SITE_NAME: erp.local
+
 jobs:
   deploy-erp-app:
     runs-on: ubuntu-latest
@@ -27,12 +33,23 @@ jobs:
       run: docker network create erpnet
 
     - name: run mariadb container
-      run: docker run -it  --net erpnet --name erpdb -e MYSQL_ROOT_PASSWORD=1QWERT2 -v /home/runner/work/erpnext15-with-docker/erpnext15-with-docker/conf:/etc/mysql/conf.d -d 1devops2/erpnextdb:15
+      run: docker run -it  --net erpnet --name erpdb -e MYSQL_ROOT_PASSWORD=${{ env.MYSQL_ROOT_PASSWORD }} -v /home/runner/work/erpnext15-with-docker/erpnext15-with-docker/conf:/etc/mysql/conf.d -d 1devops2/erpnextdb:15 && sleep 10
 
     - name: run erp container
-      run: docker run -it --network erpnet --name erp -p 8000:8000 -p 9000:9000 -p 3306:3306 -d 1devops2/erpnext:15
+      run: docker run -it --network erpnet --name erp -p 8000:8000 -p 9000:9000 -p 3306:3306 -d 1devops2/erpnext:15 && sleep 10
     
     - name: check running containers
       run: docker ps 
 
+    - name: setup frappe and erp app
+      run: |
+          docker exec erp bash -c " 
+          cd frappe-bench && \
+          bench new-site ${{ env.APP_SITE_NAME }} --admin-password '${{ env.ADMIN_PASSWORD }}' --mariadb-root-username ${{ env.MYSQL_ROOT_USER }} --mariadb-root-password ${{ env.MYSQL_ROOT_PASSWORD }} --db-host erpdb && \
+          bench --site ${{ env.APP_SITE_NAME }} install-app erpnext && \
+          bench use ${{ env.APP_SITE_NAME }} && \
+          cd /home/frappe/frappe-bench && screen -dmS bench_session bash -c 'bench start' && \
+          exit "
+
+    
   
