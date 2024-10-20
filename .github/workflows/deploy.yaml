@@ -16,9 +16,23 @@ jobs:
     - name: check docker version
       run: docker --version
 
-    - name: get mariadb conf
+    - name: create conf directory & copy mariadb conf
       run: |
         mkdir conf; cd conf
         wget https://raw.githubusercontent.com/Erpnext-Setup/erpnext14-with-docker/main/conf/mariadb.cnf
         pwd
         ls -lhart
+
+    - name: create docker network
+      run: docker network create erpnet
+
+    - name: run mariadb container
+      run: docker run -it  --net erpnet --name erpdb -e MYSQL_ROOT_PASSWORD=1QWERT2 -v /home/runner/work/erpnext15-with-docker/erpnext15-with-docker/conf:/etc/mysql/conf.d -d 1devops2/erpnextdb:15
+
+    - name: run erp container
+      run: docker run -it --network erpnet --name erp -p 8000:8000 -p 9000:9000 -p 3306:3306 -d 1devops2/erpnext:15
+    
+    - name: check running containers
+      run: docker ps 
+
+  
