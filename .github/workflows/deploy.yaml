@@ -15,3 +15,10 @@ jobs:
 
     - name: check docker version
       run: docker --version
+
+    - name: get mariadb conf
+      run: |
+        mkdir conf; cd conf
+        wget https://raw.githubusercontent.com/Erpnext-Setup/erpnext14-with-docker/main/conf/mariadb.cnf
+        pwd
+        ls -lhart
